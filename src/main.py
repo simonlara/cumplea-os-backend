@@ -37,6 +37,10 @@ def handle_person():
 
     return jsonify(response_body), 200
 
+@app.route("/signup/", methods=['GET', 'POST']) 
+def show_signup_form():
+    return render_template("signup_form.html")
+
 # this only runs if `$ python src/main.py` is exercuted
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
