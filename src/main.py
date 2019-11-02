@@ -34,7 +34,7 @@ def sitemap():
 def handle_person():
 
     response_body = {
-        "hello": "world"
+        "hello": "jorge"
     }
 
     return jsonify(response_body), 200
