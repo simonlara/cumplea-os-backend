@@ -8,8 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from models import db
-from models import Persons
-persons=Persons()
+from models import Person
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -38,41 +37,36 @@ def handle_person():
 
     return jsonify(response_body), 200
 
-@app.route('/persons')
+@app.route('/persons', methods=['GET'])
 def handle_persona():
     
     if request.method=='GET':
         
-        personas=jsonify(persons.querry.get())
+        persons = Person.query.all()
+        persons = list(map(lambda x: x.serialize(), persons))
        
-        return personas,200
+        return jsonify(persons), 200
 
-@app.route('/persons/<int:national_id>')
-def handle_persona(national_id):
+@app.route('/persons/<int:national_id>', methods=['GET'])
+def handle_persona2(national_id):
     
     if request.method=='GET':
-        person=jsonify( persons.querry.filterBy(national_id='national_id')
-        return person,200
+        persona = Person.query.filter_by(national_id=national_id).first().serialize()
+        #personas = Person.query.filter_by(national_id=national_id)
+        #persona = list(map(lambda x: x.serialize(), personas))
+        return jsonify(persona), 200
 
-@app.route('/persons/<int:birthday>')
-def handle_persona(birthday):
+#@app.route('/persons/<int:birthday>')
+#def handle_persona3(birthday):
     
-    if request.method=='GET':
-         personas=jsonify( persons.querry.filterBy(birthday='birthday')
-         return personas,200   
+   # if request.method=='GET':
+   #     person= person.querry.filterBy(birthday='birthday')
+   #     return jsonify(person), 200 
 
-@app.route('/persons/<int:villages_id>')
-def handle_persona(villages_id):
-    
-    if request.method=='GET':
-        person=jsonify( persons.querry.filterBy(villages_id='villages_id')
-        return person,200     
-
+#@app.route('/persons/<int:villages_id>')
+#def handle_persona4(villages_id):
+    #pass
    
-
-       
-
-
 # this only runs if `$ python src/main.py` is exercuted
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))

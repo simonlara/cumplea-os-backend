@@ -1,11 +1,10 @@
-from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:1621@localhost/cumple'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#app = Flask(__name__)
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:1621@localhost/cumple'
+#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
 from sqlalchemy import CHAR, Column, Date, ForeignKey, String, TIMESTAMP, Text, text
 from sqlalchemy.dialects.mysql import INTEGER
@@ -15,44 +14,44 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 metadata = Base.metadata
 
-class Client(Base):
+class Client(db.Model):
     __tablename__ = 'clients'
 
     id = Column(INTEGER(11), primary_key=True)
     rol_id = Column(String(45), nullable=False)
 
-class Role(Base):
+class Role(db.Model):
     __tablename__ = 'roles'
 
     id = Column(INTEGER(11), primary_key=True)
     name = Column(String(120))
     code = Column(String(6))
 
-class Status(Base):
+class Status(db.Model):
     __tablename__ = 'status'
 
     id = Column(INTEGER(11), primary_key=True)
     Clients_User = Column(INTEGER(11), nullable=False)
     status = Column(String(45), nullable=False)
 
-class Typecontact(Base):
+class Typecontact(db.Model):
     __tablename__ = 'typecontact'
 
     id = Column(INTEGER(11), primary_key=True)
     name = Column(String(45))
 
-class Typesrelative(Base):
+class Typesrelative(db.Model):
     __tablename__ = 'typesrelatives'
 
     id = Column(INTEGER(11), primary_key=True)
     name = Column(String(45), nullable=False)
 
-class Village(Base):
+class Village(db.Model):
     __tablename__ = 'villages'
 
     id = Column(INTEGER(11), primary_key=True)
 
-class Person(Base):
+class Person(db.Model):
     __tablename__ = 'persons'
 
     id = Column(INTEGER(11), primary_key=True)
@@ -66,7 +65,19 @@ class Person(Base):
 
     villages = relationship('Village')
 
-class User(Base):
+    def serialize(self):
+        return {
+            "id": self.id,
+            "national_id": self.national_id,
+            "lastname": self.lastname,
+            "name": self.name,
+            "sex": self.sex,
+            "birthday": self.birthday,
+            "address": self.address
+
+        }
+
+class User(db.Model):
     __tablename__ = 'users'
 
     id = Column(INTEGER(11), primary_key=True)
@@ -78,7 +89,7 @@ class User(Base):
 
     roles = relationship('Role')
 
-class Campaign(Base):
+class Campaign(db.Model):
     __tablename__ = 'campaigns'
 
     id = Column(INTEGER(11), primary_key=True, nullable=False)
@@ -97,7 +108,7 @@ class Campaign(Base):
     villages = relationship('Village')
 
 
-class Contact(Base):
+class Contact(db.Model):
     __tablename__ = 'contacts'
 
     id = Column(INTEGER(11), primary_key=True)
@@ -109,7 +120,7 @@ class Contact(Base):
     typeContact = relationship('Typecontact')
 
 
-class Family(Base):
+class Family(db.Model):
     __tablename__ = 'families'
 
     id = Column(INTEGER(11), primary_key=True)
