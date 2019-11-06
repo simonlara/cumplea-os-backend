@@ -18,7 +18,44 @@ class Client(db.Model):
     __tablename__ = 'clients'
 
     id = Column(INTEGER(11), primary_key=True)
-    rol_id = Column(String(45), nullable=False)
+    nombre = Column(String(45), nullable=False)
+    rut = Column(String(45), nullable=True)
+    direccion = Column(String(45), nullable=True)
+    website = Column(String(45), nullable=True)
+    email = Column(String(45), nullable=True)
+    phone = Column(String(45), nullable=True)
+    
+    users_id = Column(ForeignKey('users.id'), nullable=True, index=True)
+    users = relationship('User')
+    
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "rut": self.rut,
+            "direccion": self.direccion,
+            "website": self.website,
+            "email":self.email,
+            "phone":self.phone,
+            "users_id":self.users_id,
+            
+
+        }
+class Country(db.Model):
+    __tablename__ = 'countries'
+
+    id = Column(INTEGER(11), primary_key=True)
+    country = Column(String(45))        
+
+class Region(db.Model):
+    __tablename__ = 'regions'
+
+    id = Column(INTEGER(11), primary_key=True, nullable=False)
+    region = Column(String(45))
+    countries_id = Column(ForeignKey('countries.id'), primary_key=True, nullable=False, index=True)
+
+    countries = relationship('Country')
 
 class Role(db.Model):
     __tablename__ = 'roles'
@@ -73,8 +110,8 @@ class Person(db.Model):
             "name": self.name,
             "sex": self.sex,
             "birthday": self.birthday,
-            "address": self.address
-
+            "address": self.address,
+            "villages_id":self.villages_id
         }
 
 class User(db.Model):
