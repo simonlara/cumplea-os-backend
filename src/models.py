@@ -63,7 +63,14 @@ class Role(db.Model):
     id = Column(INTEGER(11), primary_key=True)
     name = Column(String(120))
     code = Column(String(6))
-
+    
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "code": self.code,
+           
+        }
 class Status(db.Model):
     __tablename__ = 'status'
 
@@ -125,6 +132,18 @@ class User(db.Model):
     roles_id = Column(ForeignKey('roles.id'), nullable=False, index=True)
 
     roles = relationship('Role')
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "password": self.password,
+            "create_at": self.create_at,
+            "update_at": self.update_at,
+            "roles_id": self.roles_id
+        }
+
+
 
 class Campaign(db.Model):
     __tablename__ = 'campaigns'

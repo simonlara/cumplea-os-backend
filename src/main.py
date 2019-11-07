@@ -10,6 +10,8 @@ from utils import APIException, generate_sitemap
 from models import db
 from models import Person
 from models import Client
+from models import Role
+from models import User
 #from models import * para traer todas las tablas y despues llamarlas  models.Person
 
 app = Flask(__name__)
@@ -84,7 +86,7 @@ def clientes2():
     
     data = request.json
     client = Client() #PASOXXX
-    client.name = data["name"]
+    client.nombre = data["nombre"]
     client.rut = data["rut"]
     client.direccion = data["direccion"]
     client.website = data["website"]
@@ -96,6 +98,55 @@ def clientes2():
     db.session.commit()
 
     return jsonify(client.serialize()), 200
+
+@app.route('/roles')
+def GetRoles():
+    
+    roles = Role.query.all()
+    roles = list(map(lambda x: x.serialize(), roles))
+
+    return jsonify(roles), 200        
+
+
+@app.route('/roles', methods=['POST'])
+def postRoles():
+    
+    data = request.json
+    rol = Role() #PASOXXX
+    rol.name = data["name"]
+    rol.code = data["code"]
+
+    db.session.add(rol) #PASOXXX
+    db.session.commit()
+
+    return jsonify(rol.serialize()), 200    
+
+
+@app.route('/users', methods=['POST'])
+def postUsers():
+    
+    data = request.json
+    user = User() #PASOXXX
+    user.username = data["username"]
+    user.password = data["password"]
+    user.create_at = data["create_at"]
+    user.update_at = data["update_at"]
+    user.roles_id = data["roles_id"]
+
+    db.session.add(user) #PASOXXX
+    db.session.commit()
+
+    return jsonify(user.serialize()), 200   
+
+
+@app.route('/users',methods=['GET'])
+    
+def GetUsers():
+    
+    users = User.query.all()
+    users = list(map(lambda x: x.serialize(), users))
+
+    return jsonify(users), 200         
 
 # this only runs if `$ python src/main.py` is exercuted
 if __name__ == '__main__':
