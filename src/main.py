@@ -8,6 +8,11 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from models import db
+
+from passlib.hash import pbkdf2_sha256 as sha256 #PASOXXX
+
+from flask_jwt_extended import (JWTManager, jwt_required, create_access_token, create_refresh_token, get_jwt_identity)
+
 from models import Person
 from models import Client
 from models import Role
@@ -15,14 +20,20 @@ from models import User
 from models import Campaign
 #from models import * para traer todas las tablas y despues llamarlas  models.Person
 
+
+
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_CONNECTION_STRING')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.config['JWT_SECRET_KEY'] = os.environ.get('SECRET_KEY') #PASOYYY
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600 #PASOYYY
+
 MIGRATE = Migrate(app, db)
 db.init_app(app)
 CORS(app)
-
+jwt = JWTManager(app)
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
@@ -41,6 +52,20 @@ def handle_person():
     }
 
     return jsonify(response_body), 200
+
+@app.route('/register', methods=['POST']) #PASOXXX
+def handle_register():
+
+    data = request.json
+    user = User() #PASOXXX
+    user.username = data["username"]
+    user.password = sha256.hash(data["password"])
+    user.roles_id = data["roles_id"] 
+    db.session.add(user) #PASOXXX
+    db.session.commit()
+
+    return jsonify(user.serialize()), 200
+
 
 @app.route('/persons', methods=['GET'])
 def handle_persona():
