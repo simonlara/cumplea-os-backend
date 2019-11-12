@@ -12,6 +12,7 @@ from models import Person
 from models import Client
 from models import Role
 from models import User
+from models import Campaign
 #from models import * para traer todas las tablas y despues llamarlas  models.Person
 
 app = Flask(__name__)
@@ -90,7 +91,7 @@ def clientes2():
     
     data = request.json
     client = Client() #PASOXXX
-    client.nombre = data["nombre"]
+    client.name = data["name"]
     client.rut = data["rut"]
     client.direccion = data["direccion"]
     client.website = data["website"]
@@ -102,6 +103,20 @@ def clientes2():
     db.session.commit()
 
     return jsonify(client.serialize()), 200
+
+@app.route('/campainsAdd', methods=['POST'])
+def campainsAdd():
+    
+    data = request.json
+    campaign = Campaign() #PASOXXX
+    campaign.nombre = data["Termino"]
+    
+    #user.password = sha256.hash(data["password"])
+    db.session.add(client) #PASOXXX
+    db.session.commit()
+
+    return jsonify(client.serialize()), 200
+
 
 @app.route('/roles')
 def GetRoles():

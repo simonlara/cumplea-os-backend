@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: bc4d3775390a
+Revision ID: 6d99180a3a3e
 Revises: 
-Create Date: 2019-11-06 15:03:09.625524
+Create Date: 2019-11-12 14:01:14.366856
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
 
 # revision identifiers, used by Alembic.
-revision = 'bc4d3775390a'
+revision = '6d99180a3a3e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,12 +29,6 @@ def upgrade():
     sa.Column('code', sa.String(length=6), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('status',
-    sa.Column('id', mysql.INTEGER(display_width=11), nullable=False),
-    sa.Column('Clients_User', mysql.INTEGER(display_width=11), nullable=False),
-    sa.Column('status', sa.String(length=45), nullable=False),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('typecontact',
     sa.Column('id', mysql.INTEGER(display_width=11), nullable=False),
     sa.Column('name', sa.String(length=45), nullable=True),
@@ -45,23 +39,6 @@ def upgrade():
     sa.Column('name', sa.String(length=45), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('villages',
-    sa.Column('id', mysql.INTEGER(display_width=11), nullable=False),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('persons',
-    sa.Column('id', mysql.INTEGER(display_width=11), nullable=False),
-    sa.Column('national_id', mysql.INTEGER(display_width=11), nullable=True),
-    sa.Column('lastname', sa.String(length=45), nullable=False),
-    sa.Column('name', sa.String(length=45), nullable=False),
-    sa.Column('sex', sa.CHAR(length=3), nullable=True),
-    sa.Column('birthday', sa.Date(), nullable=False),
-    sa.Column('address', sa.String(length=45), nullable=True),
-    sa.Column('villages_id', mysql.INTEGER(display_width=11), nullable=False),
-    sa.ForeignKeyConstraint(['villages_id'], ['villages.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_persons_villages_id'), 'persons', ['villages_id'], unique=False)
     op.create_table('regions',
     sa.Column('id', mysql.INTEGER(display_width=11), nullable=False),
     sa.Column('region', sa.String(length=45), nullable=True),
@@ -84,7 +61,7 @@ def upgrade():
     op.create_index(op.f('ix_users_roles_id'), 'users', ['roles_id'], unique=False)
     op.create_table('clients',
     sa.Column('id', mysql.INTEGER(display_width=11), nullable=False),
-    sa.Column('nombre', sa.String(length=45), nullable=False),
+    sa.Column('name', sa.String(length=45), nullable=False),
     sa.Column('rut', sa.String(length=45), nullable=True),
     sa.Column('direccion', sa.String(length=45), nullable=True),
     sa.Column('website', sa.String(length=45), nullable=True),
@@ -95,6 +72,45 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_clients_users_id'), 'clients', ['users_id'], unique=False)
+    op.create_table('villages',
+    sa.Column('id', mysql.INTEGER(display_width=11), nullable=False),
+    sa.Column('village', sa.String(length=45), nullable=True),
+    sa.Column('regions_id', mysql.INTEGER(display_width=11), nullable=False),
+    sa.ForeignKeyConstraint(['regions_id'], ['regions.id'], ),
+    sa.PrimaryKeyConstraint('id', 'regions_id')
+    )
+    op.create_index(op.f('ix_villages_regions_id'), 'villages', ['regions_id'], unique=False)
+    op.create_table('campaigns',
+    sa.Column('id', mysql.INTEGER(display_width=11), nullable=False),
+    sa.Column('endDate', sa.Date(), nullable=True),
+    sa.Column('budget', mysql.INTEGER(display_width=10), nullable=False),
+    sa.Column('villages_id', mysql.INTEGER(display_width=11), nullable=False),
+    sa.Column('days_before', mysql.INTEGER(display_width=11), nullable=True),
+    sa.Column('sms', sa.String(length=30), nullable=True),
+    sa.Column('mail', sa.Text(), nullable=True),
+    sa.Column('admin_id', mysql.INTEGER(display_width=11), nullable=False),
+    sa.Column('client_id', mysql.INTEGER(display_width=11), nullable=False),
+    sa.ForeignKeyConstraint(['admin_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['client_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['villages_id'], ['villages.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_campaigns_admin_id'), 'campaigns', ['admin_id'], unique=False)
+    op.create_index(op.f('ix_campaigns_client_id'), 'campaigns', ['client_id'], unique=False)
+    op.create_index(op.f('ix_campaigns_villages_id'), 'campaigns', ['villages_id'], unique=False)
+    op.create_table('persons',
+    sa.Column('id', mysql.INTEGER(display_width=11), nullable=False),
+    sa.Column('national_id', mysql.INTEGER(display_width=11), nullable=True),
+    sa.Column('lastname', sa.String(length=45), nullable=False),
+    sa.Column('name', sa.String(length=45), nullable=False),
+    sa.Column('sex', sa.CHAR(length=3), nullable=True),
+    sa.Column('birthday', sa.Date(), nullable=False),
+    sa.Column('address', sa.String(length=45), nullable=True),
+    sa.Column('villages_id', mysql.INTEGER(display_width=11), nullable=False),
+    sa.ForeignKeyConstraint(['villages_id'], ['villages.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_persons_villages_id'), 'persons', ['villages_id'], unique=False)
     op.create_table('contacts',
     sa.Column('id', mysql.INTEGER(display_width=11), nullable=False),
     sa.Column('data', sa.String(length=45), nullable=True),
@@ -119,36 +135,26 @@ def upgrade():
     op.create_index(op.f('ix_families_Persons_id'), 'families', ['Persons_id'], unique=False)
     op.create_index(op.f('ix_families_Relative_id'), 'families', ['Relative_id'], unique=False)
     op.create_index(op.f('ix_families_typesRelatives_id'), 'families', ['typesRelatives_id'], unique=False)
-    op.create_table('campaigns',
+    op.create_table('reports',
     sa.Column('id', mysql.INTEGER(display_width=11), nullable=False),
-    sa.Column('days_before', mysql.INTEGER(display_width=11), nullable=True),
-    sa.Column('Log-in_User', sa.String(length=45), nullable=False),
-    sa.Column('sms', sa.String(length=30), nullable=True),
-    sa.Column('mail', sa.Text(), nullable=True),
-    sa.Column('villages_id', mysql.INTEGER(display_width=11), nullable=False),
-    sa.Column('Clients_User', mysql.INTEGER(display_width=11), nullable=False),
-    sa.Column('users_id', mysql.INTEGER(display_width=11), nullable=False),
-    sa.Column('status_id', mysql.INTEGER(display_width=11), nullable=False),
-    sa.ForeignKeyConstraint(['Clients_User'], ['clients.id'], ),
-    sa.ForeignKeyConstraint(['status_id'], ['status.id'], ),
-    sa.ForeignKeyConstraint(['users_id'], ['users.id'], ),
-    sa.ForeignKeyConstraint(['villages_id'], ['villages.id'], ),
-    sa.PrimaryKeyConstraint('id', 'status_id')
+    sa.Column('persons_id', mysql.INTEGER(display_width=11), nullable=False),
+    sa.Column('campaigns_id', mysql.INTEGER(display_width=11), nullable=False),
+    sa.Column('email_sent', sa.BOOLEAN(create_constraint=4), nullable=True),
+    sa.Column('sms_sent', sa.BOOLEAN(create_constraint=4), nullable=True),
+    sa.ForeignKeyConstraint(['campaigns_id'], ['campaigns.id'], ),
+    sa.ForeignKeyConstraint(['persons_id'], ['persons.id'], ),
+    sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_campaigns_Clients_User'), 'campaigns', ['Clients_User'], unique=False)
-    op.create_index(op.f('ix_campaigns_status_id'), 'campaigns', ['status_id'], unique=False)
-    op.create_index(op.f('ix_campaigns_users_id'), 'campaigns', ['users_id'], unique=False)
-    op.create_index(op.f('ix_campaigns_villages_id'), 'campaigns', ['villages_id'], unique=False)
+    op.create_index(op.f('ix_reports_campaigns_id'), 'reports', ['campaigns_id'], unique=False)
+    op.create_index(op.f('ix_reports_persons_id'), 'reports', ['persons_id'], unique=False)
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_index(op.f('ix_campaigns_villages_id'), table_name='campaigns')
-    op.drop_index(op.f('ix_campaigns_users_id'), table_name='campaigns')
-    op.drop_index(op.f('ix_campaigns_status_id'), table_name='campaigns')
-    op.drop_index(op.f('ix_campaigns_Clients_User'), table_name='campaigns')
-    op.drop_table('campaigns')
+    op.drop_index(op.f('ix_reports_persons_id'), table_name='reports')
+    op.drop_index(op.f('ix_reports_campaigns_id'), table_name='reports')
+    op.drop_table('reports')
     op.drop_index(op.f('ix_families_typesRelatives_id'), table_name='families')
     op.drop_index(op.f('ix_families_Relative_id'), table_name='families')
     op.drop_index(op.f('ix_families_Persons_id'), table_name='families')
@@ -156,18 +162,22 @@ def downgrade():
     op.drop_index(op.f('ix_contacts_typeContact_id'), table_name='contacts')
     op.drop_index(op.f('ix_contacts_Persons_id'), table_name='contacts')
     op.drop_table('contacts')
+    op.drop_index(op.f('ix_persons_villages_id'), table_name='persons')
+    op.drop_table('persons')
+    op.drop_index(op.f('ix_campaigns_villages_id'), table_name='campaigns')
+    op.drop_index(op.f('ix_campaigns_client_id'), table_name='campaigns')
+    op.drop_index(op.f('ix_campaigns_admin_id'), table_name='campaigns')
+    op.drop_table('campaigns')
+    op.drop_index(op.f('ix_villages_regions_id'), table_name='villages')
+    op.drop_table('villages')
     op.drop_index(op.f('ix_clients_users_id'), table_name='clients')
     op.drop_table('clients')
     op.drop_index(op.f('ix_users_roles_id'), table_name='users')
     op.drop_table('users')
     op.drop_index(op.f('ix_regions_countries_id'), table_name='regions')
     op.drop_table('regions')
-    op.drop_index(op.f('ix_persons_villages_id'), table_name='persons')
-    op.drop_table('persons')
-    op.drop_table('villages')
     op.drop_table('typesrelatives')
     op.drop_table('typecontact')
-    op.drop_table('status')
     op.drop_table('roles')
     op.drop_table('countries')
     # ### end Alembic commands ###
