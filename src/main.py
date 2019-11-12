@@ -60,16 +60,20 @@ def handle_persona2(national_id):
         #persona = list(map(lambda x: x.serialize(), personas))
         return jsonify(persona), 200
 
-#@app.route('/persons/<int:birthday>')
-#def handle_persona3(birthday):
+@app.route('/persons/<string:birthday>', methods=['GET'])
+def handle_persona3(birthday):
     
-   # if request.method=='GET':
-   #     person= person.querry.filterBy(birthday='birthday')
-   #     return jsonify(person), 200 
+    if request.method=='GET':
+        personas= Person.query.filter_by(birthday=birthday)
+        personas = list(map(lambda x: x.serialize(), personas))
+        return jsonify(personas), 200 
 
-#@app.route('/persons/<int:villages_id>')
-#def handle_persona4(villages_id):
-    #pass
+@app.route('/village/<int:villages_id>', methods=['GET'])
+def handle_persona4(villages_id):
+    if request.method=='GET':
+        personas= Person.query.filter_by(villages_id=villages_id)
+        personas = list(map(lambda x: x.serialize(), personas))
+        return jsonify(personas), 200     
 
 @app.route('/clients', methods=['GET'])
 def clientes():
