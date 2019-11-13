@@ -6,6 +6,7 @@ from flask import Flask, request, jsonify, url_for
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
+from flask import Response
 from utils import APIException, generate_sitemap
 from models import db
 
@@ -65,6 +66,28 @@ def handle_register():
     db.session.commit()
 
     return jsonify(user.serialize()), 200
+
+@app.route('/login', methods=['POST'])
+def handle_login():
+    data = request.json
+    Response(headers={'Access-Control-Allow-Origin':'*'})
+    all_people = User.query.filter_by(username=data["username"]).first() #PASOYYY
+    if all_people is None:
+        return jsonify({
+            "ERROR": "USUARIO NO EXISTE"
+        }), 200
+
+    if sha256.verify(data["password"], all_people.password): ##PASOYYY
+        MI = create_access_token(identity = data["username"])
+        REFRESH = create_refresh_token(identity = data["username"])
+        return jsonify({
+            "token": MI,
+            "refresh": REFRESH
+            }), 200
+
+    return jsonify({
+            "ERROR": "LA CONTRASEÑA NO ES VALIDA"
+        }), 200    
 
 
 @app.route('/persons', methods=['GET'])
