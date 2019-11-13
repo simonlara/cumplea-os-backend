@@ -10,7 +10,7 @@ from utils import APIException, generate_sitemap
 from models import db
 from models import Persons
 persons=Persons()
-
+ 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_CONNECTION_STRING')
