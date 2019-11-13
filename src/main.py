@@ -61,7 +61,8 @@ def handle_register():
     user = User() #PASOXXX
     user.username = data["username"]
     user.password = sha256.hash(data["password"])
-    user.roles_id = data["roles_id"] 
+    #user.roles_id = data["roles_id"]
+    user.roles_id = 1 
     db.session.add(user) #PASOXXX
     db.session.commit()
 
@@ -92,9 +93,7 @@ def handle_login():
 
 @app.route('/persons', methods=['GET'])
 def handle_persona():
-    
 
-        
     persons = Person.query.all()
     persons = list(map(lambda x: x.serialize(), persons))
        
