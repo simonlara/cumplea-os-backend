@@ -187,7 +187,7 @@ def postRoles():
     db.session.commit()
 
     return jsonify(rol.serialize()), 200    
-
+ 
 
 @app.route('/users', methods=['POST'])
 def postUsers():
