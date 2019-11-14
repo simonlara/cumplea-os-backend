@@ -129,8 +129,16 @@ class Village(db.Model):
 
 class Person(db.Model):
     __tablename__ = 'persons'
+    id = Column(INTEGER(11), primary_key=True)
+    national_id = Column(INTEGER(11))
+    lastname = Column(String(45), nullable=False)
+    name = Column(String(45), nullable=False)
+    sex = Column(CHAR(3))
+    birthday = Column(Date, nullable=False)
+    address = Column(String(45))
+    villages_id = Column(ForeignKey('villages.id'), nullable=False, index=True)
 
-    countries = relationship('Country')
+    villages = relationship('Village')
 
 
     def serialize(self):

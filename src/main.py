@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, url_for
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
-from flask import Response
+#from flask import Response
 from utils import APIException, generate_sitemap
 from models import db
 
@@ -45,14 +45,14 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-@app.route('/hello', methods=['POST', 'GET'])
-    def handle_person():
+#@app.route('/hello', methods=['POST', 'GET'])
+#    def handle_person():
+#
+ #   response_body = {
+  #      "hello": "world"
+   # }
 
-    response_body = {
-        "hello": "world"
-    }
-
-    return jsonify(response_body), 200
+   # return jsonify(response_body), 200
 
 @app.route('/register', methods=['POST']) #PASOXXX
 def handle_register():
@@ -62,6 +62,7 @@ def handle_register():
     user.username = data["username"]
     user.password = sha256.hash(data["password"])
     user.roles_id = data["roles_id"] 
+    #respuesta=user.serialize()
     db.session.add(user) #PASOXXX
     db.session.commit()
 
@@ -70,7 +71,7 @@ def handle_register():
 @app.route('/login', methods=['POST'])
 def handle_login():
     data = request.json
-    Response(headers={'Access-Control-Allow-Origin':'*'})
+   # Response(headers={'Access-Control-Allow-Origin':'*'})
     all_people = User.query.filter_by(username=data["username"]).first() #PASOYYY
     if all_people is None:
         return jsonify({
@@ -92,9 +93,7 @@ def handle_login():
 
 @app.route('/persons', methods=['GET'])
 def handle_persona():
-    
 
-        
     persons = Person.query.all()
     persons = list(map(lambda x: x.serialize(), persons))
        
