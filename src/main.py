@@ -151,18 +151,32 @@ def clientes2():
 
     return jsonify(client.serialize()), 200
 
+@app.route('/campaigns/<int:client_id>', methods=['GET'])
+def handleCampaigns(client_id):
+    
+    if request.method=='GET':
+        campaigns= Campaign.query.filter_by(client_id=client_id)
+        campaigns = list(map(lambda x: x.serialize(), campaigns))
+        return jsonify(campaigns), 200   
+
 @app.route('/campainsAdd', methods=['POST'])
 def campainsAdd():
     
     data = request.json
     campaign = Campaign() #PASOXXX
-    campaign.nombre = data["Termino"]
-    
+    campaign.endDate = data["endDate"]
+    campaign.budget = data["budget"]
+    campaign.villages_id = data["villages_id"]
+    campaign.days_before = data["days_before"]
+    campaign.sms = data["sms"]
+    campaign.mail = data["mail"]
+    campaign.admin_id = data["admin_id"]
+    campaign.client_id = data["client_id"]
     #user.password = sha256.hash(data["password"])
-    db.session.add(client) #PASOXXX
+    db.session.add(campaign) #PASOXXX
     db.session.commit()
 
-    return jsonify(client.serialize()), 200
+    return jsonify(campaign.serialize()), 200
 
 
 @app.route('/roles')

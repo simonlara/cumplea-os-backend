@@ -204,7 +204,7 @@ class Campaign(db.Model):
             "sms": self.sms,
             "mail": self.mail,
             "admin_id": self.admin_id,
-            "admin": self.admin,
+            "client_id": self.client_id,
 
         }
 
