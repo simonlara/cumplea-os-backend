@@ -116,10 +116,14 @@ def handle_persona3(birthday):
         personas = list(map(lambda x: x.serialize(), personas))
         return jsonify(personas), 200 
 
-@app.route('/village/<int:villages_id>', methods=['GET'])
+@app.route('/village/<int:villages_id>', methods=['POST'])
 def handle_persona4(villages_id):
-    if request.method=='GET':
-        personas= Person.query.filter_by(villages_id=villages_id)
+    if request.method=='POST':
+        data = request.json
+        personas= Person.query.filter_by(villages_id=villages_id,birthday="18/10/10")
+        #personas= personas.query.filter_by(birthday=data['days_before'])        
+
+
         personas = list(map(lambda x: x.serialize(), personas))
         return jsonify(personas), 200     
 
