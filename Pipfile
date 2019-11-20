@@ -19,6 +19,7 @@ gunicorn = "*"
 mysqlclient = "*"
 flask-jwt-extended = "*"
 passlib = "*"
+flask-mail = "*"
 
 [requires]
 python_version = "3.6"

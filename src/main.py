@@ -2,13 +2,15 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
-from flask import Flask, request, jsonify, url_for
+from flask import Flask, request, jsonify, url_for, redirect
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 #from flask import Response
 from utils import APIException, generate_sitemap
 from models import db
+
+from flask_mail import Mail, Message
 
 from passlib.hash import pbkdf2_sha256 as sha256 #PASOXXX
 
@@ -19,6 +21,7 @@ from models import Client
 from models import Role
 from models import User
 from models import Campaign
+from models import Contact
 #from models import * para traer todas las tablas y despues llamarlas  models.Person
 
 
@@ -30,6 +33,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.config['JWT_SECRET_KEY'] = os.environ.get('SECRET_KEY') #PASOYYY
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600 #PASOYYY
+
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'tareas4geeks@gmail.com'
+app.config['MAIL_PASSWORD'] = '4geeks2019'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
 
 MIGRATE = Migrate(app, db)
 db.init_app(app)
@@ -59,6 +69,11 @@ def handle_register():
 
     data = request.json
     user = User() #PASOXXX
+    usuarioexiste = User.query.filter_by(username=data["username"]).first()
+    if usuarioexiste is not None:
+        return jsonify({
+            "ERROR": "USUARIO YA EXISTE"
+        }), 200
     user.username = data["username"]
     user.password = sha256.hash(data["password"])
     user.roles_id = data["roles_id"] 
@@ -120,14 +135,27 @@ def handle_persona3(birthday):
 def handle_persona4(villages_id):
     if request.method=='POST':
         data = request.json
-        personas= Person.query.filter_by(villages_id=villages_id,birthday="18/10/10")
+        personas= Person.query.filter_by(villages_id=villages_id,birthday="18/01/08")
         #personas= personas.query.filter_by(birthday=data['days_before'])        
+        contactos=Contact.query.filter_by(Persons_id=9)
+        email='simon.larah@gmail.com'
 
+        mail = Mail(app)
+        msg = Message('Hello',
+            sender = 'tareas4geeks@gmail.com',
+            recipients = [email],
+
+        )
+        msg.subject = 'FELIZ CUMPLEAÑOS!'
+        msg.html = data['mail']
+        mail.send(msg)
 
         personas = list(map(lambda x: x.serialize(), personas))
-        return jsonify(personas), 200     
+        contactos = list(map(lambda x: x.serialize(), contactos))
+        return jsonify(contactos), 200     
 
 @app.route('/clients', methods=['GET'])
+#@jwt_required
 def clientes():
     
     if request.method=='GET':
@@ -142,6 +170,11 @@ def clientes2():
     
     data = request.json
     client = Client() #PASOXXX
+    clienteexiste = Client.query.filter_by(rut=data["rut"]).first()
+    if clienteexiste is not None:
+        return jsonify({
+            "ERROR": "RUT DE CLIENTE YA EXISTE"
+        }), 200    
     client.name = data["name"]
     client.rut = data["rut"]
     client.direccion = data["direccion"]
@@ -230,7 +263,32 @@ def GetUsers():
     users = User.query.all()
     users = list(map(lambda x: x.serialize(), users))
 
-    return jsonify(users), 200         
+    return jsonify(users), 200    
+
+@app.route('/test-mail', methods=['POST'])
+
+def sendmail():
+    data = request.json
+    mail = Mail(app)
+    msg = Message('Hello',
+        sender = 'tareas4geeks@gmail.com',
+        recipients = data['recipients'],
+
+    )
+    msg.subject = 'FELIZ CUMPLEAÑOS!'
+    msg.html = data['html']
+    mail.send(msg)
+
+
+    return jsonify('mail enviado'), 200
+
+
+
+
+
+
+
+
 
 # this only runs if `$ python src/main.py` is exercuted
 if __name__ == '__main__':
