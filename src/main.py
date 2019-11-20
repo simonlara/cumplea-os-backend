@@ -138,15 +138,14 @@ def handle_persona4(villages_id):
         personas= Person.query.filter_by(villages_id=villages_id,birthday="18/01/08")
         #personas= personas.query.filter_by(birthday=data['days_before'])        
         contactos=Contact.query.filter_by(Persons_id=9)
-        email='simon.larah@gmail.com'
-
+        
         mail = Mail(app)
         msg = Message('Hello',
             sender = 'tareas4geeks@gmail.com',
-            recipients = [email],
+            recipients = ['simon.larah@gmail.com','sotomayor001@gmail.com','jorge_raggio_a@hotmail.com']
 
         )
-        msg.subject = 'FELIZ CUMPLEAÑOS!'
+        msg.subject = 'FELIZ CUMPLEAÑOS! te desea Pastelería Las Delicias'
         msg.html = data['mail']
         mail.send(msg)
 
