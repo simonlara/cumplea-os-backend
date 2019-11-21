@@ -187,13 +187,37 @@ def clientes2():
 
     return jsonify(client.serialize()), 200
 
+@app.route('/clients/<int:id>', methods=['DELETE'])
+#@jwt_required
+def clientsDelete(id):
+
+    client = Client()
+    client = Client.query.filter_by(id=id).first()
+    borrado=client
+    db.session.delete(client) #PASOXXX
+    db.session.commit()
+
+    return jsonify('borrado cliente'), 200    
+
 @app.route('/campaigns/<int:client_id>', methods=['GET'])
 def handleCampaigns(client_id):
     
     if request.method=='GET':
         campaigns= Campaign.query.filter_by(client_id=client_id)
         campaigns = list(map(lambda x: x.serialize(), campaigns))
-        return jsonify(campaigns), 200   
+        return jsonify(campaigns), 200  
+
+@app.route('/campaigns/<int:id>', methods=['DELETE'])
+#@jwt_required
+def campaignDelete(id):
+
+    campaign = Campaign()
+    campaign = Campaign.query.filter_by(id=id).first()
+    borrado=campaign
+    db.session.delete(campaign) #PASOXXX
+    db.session.commit()
+
+    return jsonify('Campaña borrada'), 200            
 
 @app.route('/campainsAdd', methods=['POST'])
 def campainsAdd():
